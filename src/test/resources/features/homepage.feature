@@ -12,3 +12,11 @@ Feature: Trmix Website Homepage Tests
     And user clicks on Company menu
     And user clicks on Contact menu
     Then all menu navigations should be successful
+
+  Scenario: User clicks on social media icons
+    Given user navigates to Trmix homepage
+    When user clicks on Facebook icon
+    And user clicks on Twitter icon
+    And user clicks on LinkedIn icon
+    And user clicks on Instagram icon
+    Then all social media icon clicks should be successful

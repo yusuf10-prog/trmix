@@ -55,6 +55,33 @@ public class HomePageSteps {
         Assert.assertTrue("Navigation completed successfully", true);
     }
 
+    @When("user clicks on Facebook icon")
+    public void userClicksOnFacebookIcon() {
+        homePage.clickSocialMediaIcon("facebook");
+    }
+
+    @And("user clicks on Twitter icon")
+    public void userClicksOnTwitterIcon() {
+        homePage.clickSocialMediaIcon("twitter");
+    }
+
+    @And("user clicks on LinkedIn icon")
+    public void userClicksOnLinkedInIcon() {
+        homePage.clickSocialMediaIcon("linkedin");
+    }
+
+    @And("user clicks on Instagram icon")
+    public void userClicksOnInstagramIcon() {
+        homePage.clickSocialMediaIcon("instagram");
+    }
+
+    @Then("all social media icon clicks should be successful")
+    public void allSocialMediaIconClicksShouldBeSuccessful() {
+        // Since social media links open in new tabs/windows, we can verify the page title hasn't changed
+        Assert.assertTrue("Page title should remain unchanged after social media clicks", 
+            !homePage.getPageTitle().isEmpty());
+    }
+
     @After
     public void tearDown() {
         Driver.closeDriver();

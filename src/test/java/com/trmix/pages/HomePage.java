@@ -10,6 +10,12 @@ public class HomePage extends BasePage {
     private final By hamburgerMenu = By.cssSelector("[class*='menu'], [class*='navbar'], [class*='nav-toggle']");
     private final By allNavLinks = By.cssSelector("a[href], button[role='link']");
     
+    // Social media icon locators
+    private final By linkedinIcon = By.cssSelector("a[href*='linkedin.com/company/trmixcom']");
+    private final By facebookIcon = By.cssSelector("a.tt-magnetic-item[href*='#']:nth-of-type(2)");
+    private final By twitterIcon = By.cssSelector("a.tt-magnetic-item[href*='#']:nth-of-type(3)");
+    private final By instagramIcon = By.cssSelector("a.tt-magnetic-item[href*='#']:nth-of-type(4)");
+    
     public HomePage(WebDriver driver) {
         super(driver);
     }
@@ -67,6 +73,33 @@ public class HomePage extends BasePage {
         } catch (Exception e) {
             System.out.println("Menu button not found or not needed");
         }
+    }
+
+    public void clickSocialMediaIcon(String platform) {
+        By iconLocator;
+        switch (platform.toLowerCase()) {
+            case "facebook":
+                iconLocator = facebookIcon;
+                break;
+            case "twitter":
+            case "x":
+                iconLocator = twitterIcon;
+                break;
+            case "linkedin":
+                iconLocator = linkedinIcon;
+                break;
+            case "instagram":
+                iconLocator = instagramIcon;
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported social media platform: " + platform);
+        }
+        
+        WebElement icon = driver.findElement(iconLocator);
+        scrollIntoView(icon);
+        js.executeScript("arguments[0].style.visibility = 'visible'; arguments[0].style.display = 'block';", icon);
+        icon.click();
+        System.out.println("Clicked on " + platform + " icon");
     }
 
     private void clickMenuByText(String... textOptions) {

@@ -1,9 +1,10 @@
 package com.trmix.utilities;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 public class Driver {
     private static ThreadLocal<WebDriver> driverPool = new ThreadLocal<>();
@@ -14,16 +15,24 @@ public class Driver {
     public static WebDriver getDriver() {
         if (driverPool.get() == null) {
             String browser = System.getProperty("browser", "chrome");
+            WebDriver driver;
+
             switch (browser.toLowerCase()) {
                 case "firefox":
-                    WebDriverManager.firefoxdriver().setup();
-                    driverPool.set(new FirefoxDriver());
+                    FirefoxOptions firefoxOptions = new FirefoxOptions();
+                    driver = new FirefoxDriver(firefoxOptions);
                     break;
                 default:
-                    WebDriverManager.chromedriver().setup();
-                    driverPool.set(new ChromeDriver());
+                    System.setProperty("webdriver.chrome.driver", "src/test/resources/drivers/chromedriver-mac-x64/chromedriver");
+                    ChromeOptions chromeOptions = new ChromeOptions();
+                    chromeOptions.addArguments("--remote-allow-origins=*");
+                    chromeOptions.addArguments("--no-sandbox");
+                    chromeOptions.addArguments("--disable-dev-shm-usage");
+                    driver = new ChromeDriver(chromeOptions);
             }
-            driverPool.get().manage().window().maximize();
+
+            driver.manage().window().maximize();
+            driverPool.set(driver);
         }
         return driverPool.get();
     }
