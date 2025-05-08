@@ -29,13 +29,12 @@ public class Driver {
                     chromeOptions.addArguments("--remote-allow-origins=*");
                     chromeOptions.addArguments("--no-sandbox");
                     chromeOptions.addArguments("--disable-dev-shm-usage");
+                    chromeOptions.addArguments("--start-maximized");
                     driver = new ChromeDriver(chromeOptions);
-                    driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
-                    driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(3));
-                    driver.manage().timeouts().scriptTimeout(Duration.ofMillis(500));
+                    driver.manage().timeouts().implicitlyWait(Duration.ZERO);
+                    driver.manage().timeouts().pageLoadTimeout(Duration.ZERO);
+                    driver.manage().timeouts().scriptTimeout(Duration.ZERO);
             }
-
-            driver.manage().window().maximize();
             driverPool.set(driver);
         }
         return driverPool.get();

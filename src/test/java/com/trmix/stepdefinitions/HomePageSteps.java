@@ -33,9 +33,9 @@ public class HomePageSteps {
         homePage.clickProductsMenu();
     }
 
-    @And("user clicks on Technologies menu")
+    @When("user clicks on Technologies menu")
     public void userClicksOnTechnologiesMenu() {
-        homePage.clickTechnologiesMenu();
+        homePage.clickTechnologyMenu();
     }
 
     @And("user clicks on Company menu")

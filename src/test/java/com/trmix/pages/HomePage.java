@@ -4,196 +4,91 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import java.util.List;
-import java.util.Set;
 
 public class HomePage extends BasePage {
     
-    private final By hamburgerMenu = By.cssSelector("[class*='menu'], [class*='navbar'], [class*='nav-toggle']");
-    private final By allNavLinks = By.cssSelector("a[href], button[role='link']");
-    
-    // Social media icon locators
-    private final By linkedinIcon = By.cssSelector("a[href*='linkedin.com/company/trmixcom']");
-    private final By facebookIcon = By.cssSelector("a.tt-magnetic-item[href*='#']:nth-of-type(2)");
-    private final By twitterIcon = By.cssSelector("a.tt-magnetic-item[href*='#']:nth-of-type(3)");
-    private final By instagramIcon = By.cssSelector("a.tt-magnetic-item[href*='#']:nth-of-type(4)");
-    
+    private final By linkedinIcon = By.xpath("//a[contains(@href, 'linkedin.com/company/trmixcom')]|//a[contains(@class, 'tt-magnetic-item')][1]");
+    private final By facebookIcon = By.xpath("//a[contains(@class, 'tt-magnetic-item')][2]");
+    private final By twitterIcon = By.xpath("//a[contains(@class, 'tt-magnetic-item')][3]");
+    private final By instagramIcon = By.xpath("//a[contains(@class, 'tt-magnetic-item')][4]");
+    private final By hamburgerMenu = By.xpath("//button[contains(@class, 'menu') or contains(@class, 'navbar') or contains(@class, 'nav-toggle')]|//div[contains(@class, 'menu-toggle')]");
+
     public HomePage(WebDriver driver) {
         super(driver);
     }
 
     public void navigateToHomePage() {
         driver.get("https://www.trmix.com");
-        js.executeScript("return document.readyState").equals("complete");
-        acceptCookiesIfPresent();
-        logAllLinks();
-    }
-
-    private void logAllLinks() {
-        System.out.println("\n=== All Navigation Links ===");
-        List<WebElement> links = driver.findElements(allNavLinks);
-        for (WebElement link : links) {
-            try {
-                System.out.println("Text: '" + link.getText() + "'");
-                System.out.println("Href: '" + link.getAttribute("href") + "'");
-                System.out.println("Class: '" + link.getAttribute("class") + "'");
-                System.out.println("Is Displayed: " + link.isDisplayed());
-                System.out.println("---");
-            } catch (Exception e) {
-                // Ignore stale elements
-            }
-        }
-        System.out.println("=== End of Navigation Links ===\n");
     }
 
     private void openMobileMenuIfNeeded() {
         try {
-            List<WebElement> menuButtons = driver.findElements(hamburgerMenu);
-            for (WebElement button : menuButtons) {
-                if (button.isDisplayed()) {
-                    try {
-                        System.out.println("Found menu button with classes: " + button.getAttribute("class"));
-                        button.click();
-                        // Menü açıldıktan sonra linkleri hemen logla
-                        logAllLinks(); // Menü açıldıktan sonra linkleri tekrar logla
-                        return;
-                    } catch (Exception e) {
-                        js.executeScript("arguments[0].click();", button);
-                        Thread.sleep(2000);
-                        logAllLinks();
-                        return;
-                    }
-                }
+            WebElement menuButton = driver.findElement(hamburgerMenu);
+            if (menuButton.isDisplayed()) {
+                js.executeScript("arguments[0].click();", menuButton);
             }
-        } catch (Exception e) {
-            System.out.println("Menu button not found or not needed");
-        }
+        } catch (Exception ignored) {}
     }
 
     public void clickAllSocialMediaIcons() {
-        // Tüm sosyal medya ikonlarını bir listede topla
         List<By> socialMediaIcons = List.of(linkedinIcon, facebookIcon, twitterIcon, instagramIcon);
-        List<String> iconNames = List.of("LinkedIn", "Facebook", "Twitter", "Instagram");
         String mainWindow = driver.getWindowHandle();
         
-        // Her bir ikonu sırayla tıkla
-        for (int i = 0; i < socialMediaIcons.size(); i++) {
+        for (By iconLocator : socialMediaIcons) {
             try {
                 driver.switchTo().window(mainWindow);
-                WebElement icon = driver.findElement(socialMediaIcons.get(i));
-                scrollIntoView(icon);
-                js.executeScript("arguments[0].style.visibility = 'visible'; arguments[0].style.display = 'block';", icon);
+                WebElement icon = driver.findElement(iconLocator);
                 js.executeScript("arguments[0].click();", icon);
-                System.out.println("Clicked on " + iconNames.get(i) + " icon");
-            } catch (Exception e) {
-                System.out.println("Failed to click " + iconNames.get(i) + " icon: " + e.getMessage());
-            }
+            } catch (Exception ignored) {}
         }
         
-        // Tüm yeni sekmeleri kapat
-        Set<String> windows = driver.getWindowHandles();
-        for (String window : windows) {
-            if (!window.equals(mainWindow)) {
+        driver.getWindowHandles().stream()
+            .filter(window -> !window.equals(mainWindow))
+            .forEach(window -> {
                 driver.switchTo().window(window);
-                System.out.println("Closing window with URL: " + driver.getCurrentUrl());
                 driver.close();
-            }
-        }
+            });
+            
         driver.switchTo().window(mainWindow);
-    }
-
-    public void clickSocialMediaIcon(String platform) {
-        By iconLocator;
-        switch (platform.toLowerCase()) {
-            case "facebook":
-                iconLocator = facebookIcon;
-                break;
-            case "twitter":
-            case "x":
-                iconLocator = twitterIcon;
-                break;
-            case "linkedin":
-                iconLocator = linkedinIcon;
-                break;
-            case "instagram":
-                iconLocator = instagramIcon;
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported social media platform: " + platform);
-        }
-        
-        WebElement icon = driver.findElement(iconLocator);
-        scrollIntoView(icon);
-        js.executeScript("arguments[0].style.visibility = 'visible'; arguments[0].style.display = 'block';", icon);
-        icon.click();
-        System.out.println("Clicked on " + platform + " icon");
     }
 
     private void clickMenuByText(String... textOptions) {
         openMobileMenuIfNeeded();
-        List<WebElement> links = driver.findElements(allNavLinks);
-        System.out.println("\nTrying to find menu item with options: " + String.join(", ", textOptions));
         
-        for (WebElement link : links) {
+        for (String text : textOptions) {
             try {
-                String text = link.getText().trim().toLowerCase();
-                String href = link.getAttribute("href");
-                String className = link.getAttribute("class");
-                
-                System.out.println("Checking link - Text: '" + text + "', Href: '" + href + "', Class: '" + className + "'");
-                
-                // Text veya href içinde aranan kelimeler var mı kontrol et
-                boolean matchFound = false;
-                for (String option : textOptions) {
-                    if ((text.contains(option.toLowerCase())) || 
-                        (href != null && href.toLowerCase().contains(option.toLowerCase())) ||
-                        (className != null && className.toLowerCase().contains(option.toLowerCase()))) {
-                        matchFound = true;
-                        System.out.println("Match found with option: " + option);
-                        break;
-                    }
-                }
-                
-                if (matchFound) {
-                    System.out.println("Attempting to click matching element");
-                    js.executeScript("arguments[0].style.visibility = 'visible'; arguments[0].style.display = 'block';", link);
-                    scrollIntoView(link);
-                    try {
-                        link.click();
-                        System.out.println("Successfully clicked element");
-                        return;
-                    } catch (Exception e) {
-                        System.out.println("Direct click failed, trying JavaScript click");
-                        js.executeScript("arguments[0].click();", link);
-                        System.out.println("Successfully clicked element with JavaScript");
-                        return;
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println("Error processing link: " + e.getMessage());
-                continue;
-            }
+                WebElement link = driver.findElement(By.xpath(String.format("//a[translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')='%s']|//button[translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')='%s']", text.toLowerCase(), text.toLowerCase())));
+                js.executeScript("arguments[0].click();", link);
+                return;
+            } catch (Exception ignored) {}
         }
-        throw new RuntimeException("No clickable menu item found with text options: " + String.join(", ", textOptions));
     }
 
     public void clickHomeMenu() {
-        clickMenuByText("anasayfa", "home", "/", "index");
+        clickMenuByText("ANA SAYFA", "HOME");
     }
 
     public void clickProductsMenu() {
-        clickMenuByText("ürünler", "products", "urunler", "product");
+        clickMenuByText("ÜRÜNLER", "PRODUCTS");
     }
 
-    public void clickTechnologiesMenu() {
-        clickMenuByText("teknoloji", "technology", "tech");
+    public void clickTechnologyMenu() {
+        clickMenuByText("TEKNOLOJİ VE ÇÖZÜMLER", "TECHNOLOGY AND SOLUTIONS");
     }
 
     public void clickCompanyMenu() {
-        clickMenuByText("şirket", "sirket", "company", "about", "hakkında", "hakkimizda");
+        clickMenuByText("ŞİRKET", "COMPANY");
     }
 
     public void clickContactMenu() {
-        clickMenuByText("iletişim", "iletisim", "contact");
+        clickMenuByText("İLETİŞİM", "CONTACT");
+    }
+
+    public void clickEnglishButton() {
+        try {
+            WebElement englishButton = driver.findElement(By.xpath("//a[contains(@class, 'tt-btn') and contains(text(), 'ENGLISH')]"));
+            js.executeScript("arguments[0].click();", englishButton);
+        } catch (Exception ignored) {}
     }
 
     public String getPageTitle() {
