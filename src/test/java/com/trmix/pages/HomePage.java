@@ -26,7 +26,7 @@ public class HomePage extends BasePage {
         acceptCookiesIfPresent();
         // Sayfanın yüklenmesi için ekstra bekleme
         try {
-            Thread.sleep(5000);
+            Thread.sleep(2000); // Bekleme süresini 2 saniyeye düşürdük
             // Tüm linkleri logla
             logAllLinks();
         } catch (InterruptedException e) {
@@ -59,7 +59,7 @@ public class HomePage extends BasePage {
                     try {
                         System.out.println("Found menu button with classes: " + button.getAttribute("class"));
                         button.click();
-                        Thread.sleep(2000); // Menü açılma animasyonunu bekle
+                        Thread.sleep(1000); // Menü açılma animasyonunu bekleme süresini 1 saniyeye düşürdük
                         logAllLinks(); // Menü açıldıktan sonra linkleri tekrar logla
                         return;
                     } catch (Exception e) {
@@ -72,6 +72,37 @@ public class HomePage extends BasePage {
             }
         } catch (Exception e) {
             System.out.println("Menu button not found or not needed");
+        }
+    }
+
+    public void clickAllSocialMediaIcons() {
+        // Tüm sosyal medya ikonlarını bir listede topla
+        List<By> socialMediaIcons = List.of(linkedinIcon, facebookIcon, twitterIcon, instagramIcon);
+        List<String> iconNames = List.of("LinkedIn", "Facebook", "Twitter", "Instagram");
+        
+        // Her bir ikonu sırayla tıkla
+        for (int i = 0; i < socialMediaIcons.size(); i++) {
+            try {
+                WebElement icon = driver.findElement(socialMediaIcons.get(i));
+                scrollIntoView(icon);
+                js.executeScript("arguments[0].style.visibility = 'visible'; arguments[0].style.display = 'block';", icon);
+                icon.click();
+                System.out.println("Clicked on " + iconNames.get(i) + " icon");
+                
+                // Ana sekmeye geri dön
+                String mainWindow = driver.getWindowHandle();
+                for (String windowHandle : driver.getWindowHandles()) {
+                    if (!windowHandle.equals(mainWindow)) {
+                        driver.switchTo().window(windowHandle);
+                        System.out.println("Switched to " + iconNames.get(i) + " window with URL: " + driver.getCurrentUrl());
+                        driver.close();
+                    }
+                }
+                driver.switchTo().window(mainWindow);
+                
+            } catch (Exception e) {
+                System.out.println("Failed to click " + iconNames.get(i) + " icon: " + e.getMessage());
+            }
         }
     }
 

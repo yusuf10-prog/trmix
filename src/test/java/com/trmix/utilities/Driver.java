@@ -3,6 +3,7 @@ package com.trmix.utilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import java.time.Duration;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
@@ -29,6 +30,9 @@ public class Driver {
                     chromeOptions.addArguments("--no-sandbox");
                     chromeOptions.addArguments("--disable-dev-shm-usage");
                     driver = new ChromeDriver(chromeOptions);
+                    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+                    driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
+                    driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(5));
             }
 
             driver.manage().window().maximize();

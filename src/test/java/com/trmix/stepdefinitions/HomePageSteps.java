@@ -55,24 +55,9 @@ public class HomePageSteps {
         Assert.assertTrue("Navigation completed successfully", true);
     }
 
-    @When("user clicks on Facebook icon")
-    public void userClicksOnFacebookIcon() {
-        homePage.clickSocialMediaIcon("facebook");
-    }
-
-    @And("user clicks on Twitter icon")
-    public void userClicksOnTwitterIcon() {
-        homePage.clickSocialMediaIcon("twitter");
-    }
-
-    @And("user clicks on LinkedIn icon")
-    public void userClicksOnLinkedInIcon() {
-        homePage.clickSocialMediaIcon("linkedin");
-    }
-
-    @And("user clicks on Instagram icon")
-    public void userClicksOnInstagramIcon() {
-        homePage.clickSocialMediaIcon("instagram");
+    @When("user clicks on all social media icons")
+    public void userClicksOnAllSocialMediaIcons() {
+        homePage.clickAllSocialMediaIcons();
     }
 
     @Then("all social media icon clicks should be successful")
