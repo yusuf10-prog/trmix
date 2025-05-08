@@ -30,9 +30,9 @@ public class Driver {
                     chromeOptions.addArguments("--no-sandbox");
                     chromeOptions.addArguments("--disable-dev-shm-usage");
                     driver = new ChromeDriver(chromeOptions);
-                    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
-                    driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(5));
-                    driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(2));
+                    driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
+                    driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(3));
+                    driver.manage().timeouts().scriptTimeout(Duration.ofMillis(500));
             }
 
             driver.manage().window().maximize();

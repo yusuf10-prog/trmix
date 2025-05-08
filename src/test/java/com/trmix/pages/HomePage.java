@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import java.util.List;
+import java.util.Set;
 
 public class HomePage extends BasePage {
     
@@ -22,9 +23,8 @@ public class HomePage extends BasePage {
 
     public void navigateToHomePage() {
         driver.get("https://www.trmix.com");
-        waitForPageLoad();
+        js.executeScript("return document.readyState").equals("complete");
         acceptCookiesIfPresent();
-        // Tüm linkleri logla
         logAllLinks();
     }
 
@@ -73,31 +73,32 @@ public class HomePage extends BasePage {
         // Tüm sosyal medya ikonlarını bir listede topla
         List<By> socialMediaIcons = List.of(linkedinIcon, facebookIcon, twitterIcon, instagramIcon);
         List<String> iconNames = List.of("LinkedIn", "Facebook", "Twitter", "Instagram");
+        String mainWindow = driver.getWindowHandle();
         
         // Her bir ikonu sırayla tıkla
         for (int i = 0; i < socialMediaIcons.size(); i++) {
             try {
+                driver.switchTo().window(mainWindow);
                 WebElement icon = driver.findElement(socialMediaIcons.get(i));
                 scrollIntoView(icon);
                 js.executeScript("arguments[0].style.visibility = 'visible'; arguments[0].style.display = 'block';", icon);
-                icon.click();
+                js.executeScript("arguments[0].click();", icon);
                 System.out.println("Clicked on " + iconNames.get(i) + " icon");
-                
-                // Ana sekmeye geri dön
-                String mainWindow = driver.getWindowHandle();
-                for (String windowHandle : driver.getWindowHandles()) {
-                    if (!windowHandle.equals(mainWindow)) {
-                        driver.switchTo().window(windowHandle);
-                        System.out.println("Switched to " + iconNames.get(i) + " window with URL: " + driver.getCurrentUrl());
-                        driver.close();
-                    }
-                }
-                driver.switchTo().window(mainWindow);
-                
             } catch (Exception e) {
                 System.out.println("Failed to click " + iconNames.get(i) + " icon: " + e.getMessage());
             }
         }
+        
+        // Tüm yeni sekmeleri kapat
+        Set<String> windows = driver.getWindowHandles();
+        for (String window : windows) {
+            if (!window.equals(mainWindow)) {
+                driver.switchTo().window(window);
+                System.out.println("Closing window with URL: " + driver.getCurrentUrl());
+                driver.close();
+            }
+        }
+        driver.switchTo().window(mainWindow);
     }
 
     public void clickSocialMediaIcon(String platform) {
