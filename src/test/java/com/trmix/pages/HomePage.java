@@ -24,14 +24,8 @@ public class HomePage extends BasePage {
         driver.get("https://www.trmix.com");
         waitForPageLoad();
         acceptCookiesIfPresent();
-        // Sayfanın yüklenmesi için ekstra bekleme
-        try {
-            Thread.sleep(2000); // Bekleme süresini 2 saniyeye düşürdük
-            // Tüm linkleri logla
-            logAllLinks();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // Tüm linkleri logla
+        logAllLinks();
     }
 
     private void logAllLinks() {
@@ -59,7 +53,7 @@ public class HomePage extends BasePage {
                     try {
                         System.out.println("Found menu button with classes: " + button.getAttribute("class"));
                         button.click();
-                        Thread.sleep(1000); // Menü açılma animasyonunu bekleme süresini 1 saniyeye düşürdük
+                        // Menü açıldıktan sonra linkleri hemen logla
                         logAllLinks(); // Menü açıldıktan sonra linkleri tekrar logla
                         return;
                     } catch (Exception e) {
