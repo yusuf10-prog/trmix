@@ -12,6 +12,14 @@ public class HomePage extends BasePage {
     private final By twitterIcon = By.xpath("//a[contains(@class, 'tt-magnetic-item')][3]");
     private final By instagramIcon = By.xpath("//a[contains(@class, 'tt-magnetic-item')][4]");
     private final By hamburgerMenu = By.xpath("//button[contains(@class, 'menu') or contains(@class, 'navbar') or contains(@class, 'nav-toggle')]|//div[contains(@class, 'menu-toggle')]");
+    
+    // Navigation menu locators
+    private final By sirketMenu = By.xpath("//a[normalize-space()='ŞİRKET']");
+    private final By iletisimMenu = By.xpath("//a[normalize-space()='İLETİŞİM']");
+    private final By urunlerMenu = By.xpath("//a[normalize-space()='ÜRÜNLER']");
+    private final By teknolojiMenu = By.xpath("//a[normalize-space()='TEKNOLOJİ VE ÇÖZÜMLER']");
+    private final By hakkimizdaMenu = By.xpath("//a[normalize-space()='HAKKIMIZDA']");
+    private final By kariyerMenu = By.xpath("//a[normalize-space()='KARİYER']");
 
     public HomePage(WebDriver driver) {
         super(driver);
@@ -84,6 +92,24 @@ public class HomePage extends BasePage {
         clickMenuByText("İLETİŞİM", "CONTACT");
     }
 
+    public void clickHakkimizdaMenu() {
+        clickMenuByText("HAKKIMIZDA", "ABOUT US");
+    }
+
+    public void clickKariyerMenu() {
+        clickMenuByText("KARİYER", "CAREER");
+    }
+
+    public void clickAllMenuItems() {
+        clickHomeMenu();
+        clickProductsMenu();
+        clickTechnologyMenu();
+        clickCompanyMenu();
+        clickContactMenu();
+        clickHakkimizdaMenu();
+        clickKariyerMenu();
+    }
+
     public void clickEnglishButton() {
         try {
             WebElement englishButton = driver.findElement(By.xpath("//a[contains(@class, 'tt-btn') and contains(text(), 'ENGLISH')]"));
@@ -93,5 +119,12 @@ public class HomePage extends BasePage {
 
     public String getPageTitle() {
         return driver.getTitle();
+    }
+
+    public void scrollToBottom() {
+        js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+        try {
+            Thread.sleep(1000); // Scroll animasyonunun tamamlanmasını bekle
+        } catch (InterruptedException ignored) {}
     }
 }
